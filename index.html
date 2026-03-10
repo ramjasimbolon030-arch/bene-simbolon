@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Website Ku</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f0f0f0;
+}
+
+button{
+padding:10px;
+margin:5px;
+cursor:pointer;
+}
+
+#gameCanvas{
+background:black;
+margin:auto;
+display:none;
+}
+
+#chatSection{
+display:none;
+}
+
+#chatbox{
+width:300px;
+height:200px;
+border:1px solid black;
+overflow:auto;
+margin:auto;
+background:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="loginPage">
+
+<h2>Login</h2>
+
+<input id="username" placeholder="Username"><br><br>
+
+<input id="password" type="password" placeholder="Password"><br><br>
+
+<button onclick="login()">Login</button>
+
+<p id="loginStatus"></p>
+
+</div>
+
+
+
+<div id="website" style="display:none">
+
+<h1>Website Ku</h1>
+
+<button onclick="showHome()">Home</button>
+<button onclick="showGame()">Game Ular</button>
+<button onclick="showChat()">Chat AI</button>
+
+<h2 id="score" style="display:none">Score: 0</h2>
+
+<button id="restartBtn" onclick="restartGame()" style="display:none">
+Restart Game
+</button>
+
+<br><br>
+
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+
+
+
+<div id="chatSection">
+
+<div id="chatbox"></div>
+
+<br>
+
+<input id="chatInput" placeholder="Tulis pesan...">
+
+<button onclick="sendChat()">Kirim</button>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+function login(){
+
+let user=document.getElementById("username").value
+let pass=document.getElementById("password").value
+
+if(user=="admin" && pass=="123"){
+
+document.getElementById("loginPage").style.display="none"
+document.getElementById("website").style.display="block"
+
+}else{
+
+document.getElementById("loginStatus").innerHTML="Login salah"
+
+}
+
+}
+
+
+
+function showHome(){
+
+document.getElementById("gameCanvas").style.display="none"
+document.getElementById("chatSection").style.display="none"
+document.getElementById("score").style.display="none"
+document.getElementById("restartBtn").style.display="none"
+
+}
+
+
+
+function showGame(){
+
+document.getElementById("gameCanvas").style.display="block"
+document.getElementById("chatSection").style.display="none"
+document.getElementById("score").style.display="block"
+
+}
+
+
+
+function showChat(){
+
+document.getElementById("chatSection").style.display="block"
+document.getElementById("gameCanvas").style.display="none"
+document.getElementById("score").style.display="none"
+
+}
+
+
+
+let canvas=document.getElementById("gameCanvas")
+let ctx=canvas.getContext("2d")
+
+let snake=[{x:200,y:200}]
+let food={x:100,y:100}
+
+let dx=20
+let dy=0
+
+let score=0
+let gameRunning=true
+
+
+
+document.addEventListener("keydown",function(event){
+
+if(event.key==="ArrowUp" && dy==0){dx=0;dy=-20}
+if(event.key==="ArrowDown" && dy==0){dx=0;dy=20}
+if(event.key==="ArrowLeft" && dx==0){dx=-20;dy=0}
+if(event.key==="ArrowRight" && dx==0){dx=20;dy=0}
+
+})
+
+
+
+function gameLoop(){
+
+if(!gameRunning) return
+
+ctx.clearRect(0,0,400,400)
+
+let head={x:snake[0].x+dx,y:snake[0].y+dy}
+
+
+
+if(
+head.x<0 || head.x>=400 ||
+head.y<0 || head.y>=400 ||
+snake.some(part => part.x===head.x && part.y===head.y)
+){
+
+gameRunning=false
+
+document.getElementById("restartBtn").style.display="block"
+
+alert("Game Over! Score: "+score)
+
+return
+
+}
+
+
+
+snake.unshift(head)
+
+
+
+if(head.x===food.x && head.y===food.y){
+
+score++
+
+document.getElementById("score").innerHTML="Score: "+score
+
+food={
+
+x:Math.floor(Math.random()*20)*20,
+y:Math.floor(Math.random()*20)*20
+
+}
+
+}else{
+
+snake.pop()
+
+}
+
+
+
+ctx.fillStyle="lime"
+
+snake.forEach(function(part){
+
+ctx.fillRect(part.x,part.y,20,20)
+
+})
+
+
+
+ctx.fillStyle="red"
+
+ctx.fillRect(food.x,food.y,20,20)
+
+}
+
+
+
+setInterval(gameLoop,200)
+
+
+
+function restartGame(){
+
+snake=[{x:200,y:200}]
+dx=20
+dy=0
+score=0
+gameRunning=true
+
+document.getElementById("score").innerHTML="Score: 0"
+document.getElementById("restartBtn").style.display="none"
+
+}
+
+
+
+function sendChat(){
+
+let input=document.getElementById("chatInput").value
+
+let box=document.getElementById("chatbox")
+
+box.innerHTML+="<p><b>Kamu:</b> "+input+"</p>"
+
+
+
+let reply="Aku tidak mengerti"
+
+
+
+if(input.includes("halo")) reply="Halo juga!"
+if(input.includes("nama")) reply="Aku chatbot sederhana"
+if(input.includes("game")) reply="Coba main game ular"
+
+
+
+box.innerHTML+="<p><b>AI:</b> "+reply+"</p>"
+
+box.scrollTop=box.scrollHeight
+
+
+
+document.getElementById("chatInput").value=""
+
+}
+
+</script>
+
+</body>
+</html>
